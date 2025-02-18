@@ -1,0 +1,13 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    {{ form_start(form) }}
+
+        {{ form_row(form.title) }}
+        {{ form_row(form.content) }}
+
+        <button class="btn btn-lg btn-primary" type="submit">
+            Éditer le sujet
+        </button>
+    {{ form_end(form) }}
+{% endblock %}

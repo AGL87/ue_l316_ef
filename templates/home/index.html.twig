@@ -1,0 +1,27 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+    <div class="action-box">
+        <a href="{{ path('app_subject_create') }}">Créer un sujet</a>
+    </div>
+
+    <div class="subjects">
+        {% for subject in subjects %}
+            <div class="subject">
+                <div class="title">
+                    <h1>{{ subject.title }}</h1> <span>par {{ subject.author.email }}</span>
+                </div>
+
+                <div class="goto">
+                    <a href="{{ path('app_subject_detail', {id: subject.id}) }}">Voir</a>
+                </div>
+
+                <div class="meta">
+                    <p>Publié le {{ subject.createdAt|date("d/m/Y") }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

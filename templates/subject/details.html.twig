@@ -1,0 +1,77 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+    <div class="subject-box">
+        <div class="subject-title">
+            <h1>{{ subject.title }}</h1>
+        </div>
+
+        <div class="subject-content">
+            {{ subject.content }}
+        </div>
+
+        <div class="subject-meta">
+            <p>Créé le {{ subject.createdAt|date('d/m/Y') }} par {{ subject.author.email }}</p>
+        </div>
+
+        <div class="subject-actions-bar">
+            {% if is_granted("ADMIN") or app.user == subject.author %}
+                <a href="{{ path('app_subject_edit', {id: subject.id}) }}">Modifier le sujet</a>
+
+                {% if subject.comments.empty %}
+                    <a href="{{ path('app_subject_delete', {id: subject.id}) }}">Supprimer le sujet</a>
+                {% endif %}
+            {% endif %}
+
+            {% if app.user != subject.author %}
+                <a href="{{ path('app_subject_like', {
+                    id: subject.id,
+                    mode: "like"
+                }) }}">J'aime</a>
+                <a href="{{ path('app_subject_like', {
+                    id: subject.id,
+                    mode: "dislike"
+                }) }}">Je n'aime pas</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="comment-section">
+        <div class="form-block">
+            {{ form_start(commentsForm) }}
+            {{ form_row(commentsForm.content) }}
+
+            <button class="btn btn-lg btn-primary" type="submit">
+                Envoyer commentaire
+            </button>
+            {{ form_end(commentsForm) }}
+        </div>
+
+        <div class="comments-list">
+            {% for comment in subject.comments %}
+                <div class="comment">
+                    <p>Par {{ comment.author.email }} le {{ comment.createdAt|date("d/m/Y") }}</p>
+
+                    <p>{{ comment.content }}</p>
+
+                    <div class="actions">
+                        {% if is_granted("ADMIN") or app.user == comment.author %}
+                            <a href="{{ path('app_comment_edit', {id: comment.id}) }}">Modifier le commentaire</a>
+                            <a href="{{ path('app_comment_delete', {id: comment.id}) }}">Supprimer le commentaire</a>
+                        {% endif %}
+
+                        {% if is_granted("USER") and app.user != comment.author %}
+                            <a href="{{ path('app_comment_report', {id: comment.id}) }}">Signaler le commentaire</a>
+                        {% endif %}
+
+                        {% if is_granted("ADMIN") and app.user != comment.author %}
+                            <a href="{{ path('app_comment_valid_report', {id: comment.id}) }}">Signaler le commentaire</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
