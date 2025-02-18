@@ -46,7 +46,7 @@ class SecurityController extends AbstractController
 
             $cryptedPassword = $this->userPasswordHasher->hashPassword($user, $form->get('plainPassword')->getData());
             $user->setPassword($cryptedPassword);
-            $user->setRoles(['USER']);
+            $user->setRoles(['ROLE_USER']);
 
             $this->manager->persist($user);
             $this->manager->flush();

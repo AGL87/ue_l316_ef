@@ -32,7 +32,7 @@ class CommentController extends AbstractController
             return $this->redirectToRoute("app_home_index");
         }
 
-        if ($comment->getAuthor() !== $this->getUser() && !in_array("ADMIN", $comment->getAuthor()->getRoles(), true)) {
+        if ($comment->getAuthor() !== $this->getUser() && !in_array("ROLE_ADMIN", $comment->getAuthor()->getRoles(), true)) {
             $this->addFlash("danger", "Vous n'avez pas la permission de supprimer ce commentaire.");
             return $this->redirectToRoute("app_subject_detail", [
                 "id" => $comment->getSubject()->getId(),
@@ -60,7 +60,7 @@ class CommentController extends AbstractController
             return $this->redirectToRoute("app_home_index");
         }
 
-        if ($comment->getAuthor() !== $this->getUser() && !in_array("ADMIN", $comment->getAuthor()->getRoles(), true)) {
+        if ($comment->getAuthor() !== $this->getUser() && !in_array("ROLE_ADMIN", $comment->getAuthor()->getRoles(), true)) {
             $this->addFlash("danger", "Vous n'avez pas la permission de supprimer ce commentaire.");
             return $this->redirectToRoute("app_subject_detail", [
                 "id" => $comment->getSubject()->getId(),
@@ -84,7 +84,7 @@ class CommentController extends AbstractController
         ]);
     }
 
-    #[Route("/{id}/report", name: "app_comment_edit")]
+    #[Route("/{id}/report", name: "app_comment_report")]
     public function report(Request $request, EntityManagerInterface $manager): Response {
         $id = $request->get("id");
         $comment = $this->commentRepository->find($id);
@@ -94,19 +94,52 @@ class CommentController extends AbstractController
             return $this->redirectToRoute("app_home_index");
         }
 
-        if ($comment->getAuthor() === $this->getUser() || in_array("ADMIN", $comment->getAuthor()->getRoles(), true)) {
+        if ($comment->getAuthor() === $this->getUser() || in_array("ROLE_ADMIN", $comment->getAuthor()->getRoles(), true)) {
             $this->addFlash("danger", "Vous ne pouvez pas signaler ce commentaire.");
             return $this->redirectToRoute("app_subject_detail", [
                 "id" => $comment->getSubject()->getId(),
             ]);
         }
 
-        if ($comment->isReported()) {
+        if (!$comment->isReported()) {
             $comment->setReported(true);
             $manager->persist($comment);
             $manager->flush();
 
             $this->addFlash("success", "Le message a été signalé avec succès");
+            return $this->redirectToRoute("app_subject_detail", [
+                "id" => $comment->getSubject()->getId(),
+            ]);
+        }
+
+        return $this->redirectToRoute("app_subject_detail", [
+            "id" => $comment->getSubject()->getId(),
+        ]);
+    }
+
+    #[Route("/{id}/valid", name: "app_comment_valid")]
+    public function validComment(Request $request, EntityManagerInterface $manager): Response {
+        $id = $request->get("id");
+        $comment = $this->commentRepository->find($id);
+
+        if (!$comment) {
+            $this->addFlash("error", "Le commentaire n'existe pas.");
+            return $this->redirectToRoute("app_home_index");
+        }
+
+        if (!in_array("ROLE_ADMIN", $comment->getAuthor()->getRoles(), true)) {
+            $this->addFlash("danger", "Vous ne pouvez pas modérer ce commentaire.");
+            return $this->redirectToRoute("app_subject_detail", [
+                "id" => $comment->getSubject()->getId(),
+            ]);
+        }
+
+        if ($comment->isReported()) {
+            $comment->setReported(false);
+            $manager->persist($comment);
+            $manager->flush();
+
+            $this->addFlash("success", "Le commentaire a été approuvé avec succès");
             return $this->redirectToRoute("app_subject_detail", [
                 "id" => $comment->getSubject()->getId(),
             ]);

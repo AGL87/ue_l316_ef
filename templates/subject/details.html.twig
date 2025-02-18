@@ -16,7 +16,7 @@
         </div>
 
         <div class="subject-actions-bar">
-            {% if is_granted("ADMIN") or app.user == subject.author %}
+            {% if is_granted("ROLE_ADMIN") or app.user == subject.author %}
                 <a href="{{ path('app_subject_edit', {id: subject.id}) }}">Modifier le sujet</a>
 
                 {% if subject.comments.empty %}
@@ -37,6 +37,13 @@
         </div>
     </div>
 
+    <div>
+        <p>J'aimes : {{ subject.likes }}</p>
+        <p>Je n'aime pas : {{ subject.dislikes }}</p>
+    </div>
+
+    <hr>
+
     <div class="comment-section">
         <div class="form-block">
             {{ form_start(commentsForm) }}
@@ -56,17 +63,17 @@
                     <p>{{ comment.content }}</p>
 
                     <div class="actions">
-                        {% if is_granted("ADMIN") or app.user == comment.author %}
+                        {% if is_granted("ROLE_ADMIN") or app.user == comment.author %}
                             <a href="{{ path('app_comment_edit', {id: comment.id}) }}">Modifier le commentaire</a>
                             <a href="{{ path('app_comment_delete', {id: comment.id}) }}">Supprimer le commentaire</a>
                         {% endif %}
 
-                        {% if is_granted("USER") and app.user != comment.author %}
+                        {% if is_granted("ROLE_USER") and app.user != comment.author %}
                             <a href="{{ path('app_comment_report', {id: comment.id}) }}">Signaler le commentaire</a>
                         {% endif %}
 
-                        {% if is_granted("ADMIN") and app.user != comment.author %}
-                            <a href="{{ path('app_comment_valid_report', {id: comment.id}) }}">Signaler le commentaire</a>
+                        {% if is_granted("ROLE_ADMIN") %}
+                            <a href="{{ path('app_comment_valid', {id: comment.id}) }}">Valider le commentaire</a>
                         {% endif %}
                     </div>
                 </div>

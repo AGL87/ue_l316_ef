@@ -12,6 +12,18 @@
         {% endblock %}
     </head>
     <body>
+        <header>
+            <nav>
+                <a href="{{ path('app_home_index') }}">Accueil</a>
+                {% if app.user %}
+                    <a href="{{ path('app_logout') }}">Déconnexion</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}">Connexion</a>
+                    <a href="{{ path('app_register') }}">Inscription</a>
+                {% endif %}
+            </nav>
+        </header>
+
         <div class="message">
             {% for message in app.flashes('danger') %}
                 <div class="danger-msg">

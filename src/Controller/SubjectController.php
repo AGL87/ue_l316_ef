@@ -63,7 +63,7 @@ class SubjectController extends AbstractController
 
         $subject = $this->subjectRepository->find($id);
 
-        if (!$subject || ($subject->getAuthor() !== $this->getUser() && !in_array("ADMIN", $subject->getAuthor()->getRoles(), true))) {
+        if (!$subject || ($subject->getAuthor() !== $this->getUser() && !in_array("ROLE_ADMIN", $subject->getAuthor()->getRoles(), true))) {
             $this->addFlash("danger", "Le sujet n'existe pas");
             return $this->redirectToRoute('app_home_index');
         }
@@ -132,7 +132,7 @@ class SubjectController extends AbstractController
 
         $subject = $this->subjectRepository->find($id);
 
-        if (!$subject || ($subject->getAuthor() !== $this->getUser() && !in_array("ADMIN", $subject->getAuthor()->getRoles(), true))) {
+        if (!$subject || ($subject->getAuthor() !== $this->getUser() && !in_array("ROLE_ADMIN", $subject->getAuthor()->getRoles(), true))) {
             $this->addFlash("danger", "Le sujet n'existe pas");
             return $this->redirectToRoute('app_home_index');
         }
